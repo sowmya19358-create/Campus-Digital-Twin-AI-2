@@ -1,15 +1,109 @@
 import { motion } from 'framer-motion';
 import {
-  Building2, Cpu, AlertTriangle, CheckCircle, Brain, Zap,
-  TrendingUp, TrendingDown, Activity
+  ClipboardList,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Zap,
+  Wifi,
+  Droplets,
+  HardHat,
+  Video,
+  Plug,
+  CalendarClock,
 } from 'lucide-react';
-import ProgressChart from './ui/ProgressChart';
+import type { LucideIcon } from 'lucide-react';
 
-const dashboardCards = [
-  { icon: Building2, value: '45', label: 'Total Buildings', trend: '+2', positive: true, color: '#2563EB' },
-  { icon: Cpu, value: '2,534', label: 'Active Sensors', trend: '+156', positive: true, color: '#38BDF8' },
-  { icon: AlertTriangle, value: '12', label: 'Open Complaints', trend: '-3', positive: true, color: '#F59E0B' },
-  { icon: CheckCircle, value: '847', label: 'Completed Repairs', trend: '+28', positive: true, color: '#10B981' },
+interface SummaryCard {
+  icon: LucideIcon;
+  value: string;
+  label: string;
+  color: string;
+  gradient: string;
+  border: string;
+}
+
+const summaryCards: SummaryCard[] = [
+  {
+    icon: ClipboardList,
+    value: '156',
+    label: 'Total Issues',
+    color: '#2563EB',
+    gradient: 'from-blue-600/25 via-blue-500/10 to-transparent',
+    border: 'border-blue-500/40',
+  },
+  {
+    icon: Clock,
+    value: '18',
+    label: 'Pending Issues',
+    color: '#F59E0B',
+    gradient: 'from-yellow-500/25 via-amber-500/10 to-transparent',
+    border: 'border-yellow-500/40',
+  },
+  {
+    icon: CheckCircle2,
+    value: '42',
+    label: 'Completed Today',
+    color: '#10B981',
+    gradient: 'from-emerald-500/25 via-green-500/10 to-transparent',
+    border: 'border-emerald-500/40',
+  },
+  {
+    icon: AlertTriangle,
+    value: '3',
+    label: 'Critical Alerts',
+    color: '#EF4444',
+    gradient: 'from-red-500/25 via-rose-500/10 to-transparent',
+    border: 'border-red-500/40',
+  },
+];
+
+type Priority = 'High' | 'Medium' | 'Low' | 'Critical';
+type Status = 'In Progress' | 'Pending' | 'Completed' | 'Critical';
+
+interface MaintenanceRequest {
+  id: string;
+  location: string;
+  issue: string;
+  priority: Priority;
+  status: Status;
+}
+
+const requests: MaintenanceRequest[] = [
+  { id: 'MT-101', location: 'CSE Block', issue: 'No Electricity', priority: 'High', status: 'In Progress' },
+  { id: 'MT-102', location: 'Library', issue: 'AC Not Working', priority: 'Medium', status: 'Pending' },
+  { id: 'MT-103', location: 'Mechanical Lab', issue: 'Water Leakage', priority: 'High', status: 'Completed' },
+  { id: 'MT-104', location: 'Hostel Block A', issue: 'Wi-Fi Issue', priority: 'Low', status: 'Pending' },
+  { id: 'MT-105', location: 'Main Gate', issue: 'CCTV Camera Offline', priority: 'Critical', status: 'In Progress' },
+];
+
+const priorityStyles: Record<Priority, string> = {
+  High: 'bg-orange-500/15 text-orange-300 border-orange-500/30',
+  Medium: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  Low: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
+  Critical: 'bg-red-500/15 text-red-300 border-red-500/30',
+};
+
+const statusStyles: Record<Status, string> = {
+  Completed: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+  Pending: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30',
+  'In Progress': 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+  Critical: 'bg-red-500/15 text-red-300 border-red-500/30',
+};
+
+const progressBars = [
+  { label: 'Electrical Repairs', percent: 82, color: '#2563EB' },
+  { label: 'Network Issues', percent: 68, color: '#38BDF8' },
+  { label: 'Civil Works', percent: 55, color: '#06B6D4' },
+  { label: 'Plumbing', percent: 91, color: '#10B981' },
+];
+
+const scheduleItems = [
+  { time: '08:30 AM', task: 'Electrical inspection', location: 'CSE Block', icon: Plug },
+  { time: '10:00 AM', task: 'Network maintenance', location: 'Computer Lab', icon: Wifi },
+  { time: '01:30 PM', task: 'Water pipeline repair', location: 'Hostel Block', icon: Droplets },
+  { time: '03:00 PM', task: 'CCTV inspection', location: 'Main Gate', icon: Video },
+  { time: '05:00 PM', task: 'Generator inspection', location: 'Power Room', icon: Zap },
 ];
 
 export default function MaintenanceDashboard() {
@@ -17,9 +111,11 @@ export default function MaintenanceDashboard() {
     <section id="maintenance" className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/5 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -30,167 +126,264 @@ export default function MaintenanceDashboard() {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full glass-card text-secondary text-sm font-medium mb-4"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-secondary text-sm font-medium mb-4"
           >
-            Real-time Monitoring
+            <HardHat className="w-4 h-4" />
+            DIET Anakapalli · Live Operations
           </motion.span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-            Maintenance <span className="gradient-text">Dashboard</span>
+            Campus Maintenance <span className="gradient-text">Dashboard</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Monitor campus health metrics and track maintenance activities in real-time.
+            Monitor and manage maintenance requests across the campus in real
+            time.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {dashboardCards.map((card, index) => (
+        {/* Summary cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
+          {summaryCards.map((card, index) => (
             <motion.div
               key={card.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
-              className="glass-card rounded-2xl p-6 group"
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              whileHover={{ y: -6, scale: 1.03 }}
+              className="relative group"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{
-                    background: `linear-gradient(135deg, ${card.color}20 0%, ${card.color}10 100%)`,
-                  }}
-                >
-                  <card.icon className="w-6 h-6" style={{ color: card.color }} />
+              {/* Gradient glow */}
+              <div
+                className="absolute -inset-0.5 rounded-2xl blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"
+                style={{
+                  background: `radial-gradient(circle at center, ${card.color}40, transparent 70%)`,
+                }}
+              />
+              <div
+                className={`relative glass-card rounded-2xl p-5 sm:p-6 bg-gradient-to-br ${card.gradient} border ${card.border} transition-all duration-500 group-hover:border-white/30`}
+                style={{ boxShadow: `0 0 30px ${card.color}15` }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center border border-white/10"
+                    style={{ background: `${card.color}25` }}
+                  >
+                    <card.icon className="w-6 h-6" style={{ color: card.color }} />
+                  </div>
+                  <motion.p
+                    initial={{ opacity: 0.8 }}
+                    whileHover={{ scale: 1.08 }}
+                    className="text-3xl sm:text-4xl font-bold text-white tracking-tight"
+                  >
+                    {card.value}
+                  </motion.p>
                 </div>
-                <div
-                  className={`flex items-center gap-1 text-xs font-medium ${
-                    card.positive ? 'text-green-400' : 'text-red-400'
-                  }`}
-                >
-                  {card.positive ? (
-                    <TrendingUp className="w-4 h-4" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4" />
-                  )}
-                  {card.trend}
-                </div>
+                <p className="text-sm text-gray-400 font-medium">{card.label}</p>
               </div>
-              <h3 className="text-3xl font-bold text-white mb-1">{card.value}</h3>
-              <p className="text-sm text-gray-400">{card.label}</p>
             </motion.div>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* Recent Maintenance Requests table */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="glass-card rounded-2xl p-5 sm:p-6 mb-10"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+              <ClipboardList className="w-5 h-5 text-secondary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-white">Recent Maintenance Requests</h3>
+              <p className="text-xs text-gray-400">Latest tickets logged across campus</p>
+            </div>
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/10 text-gray-400 text-xs uppercase tracking-wider">
+                  <th className="py-3 px-4 font-medium">Ticket ID</th>
+                  <th className="py-3 px-4 font-medium">Location</th>
+                  <th className="py-3 px-4 font-medium">Issue</th>
+                  <th className="py-3 px-4 font-medium">Priority</th>
+                  <th className="py-3 px-4 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((req, i) => (
+                  <motion.tr
+                    key={req.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08 }}
+                    whileHover={{ backgroundColor: 'rgba(37,99,235,0.08)' }}
+                    className="border-b border-white/5 last:border-0"
+                  >
+                    <td className="py-4 px-4 font-mono text-sm text-white">{req.id}</td>
+                    <td className="py-4 px-4 text-sm text-gray-300">{req.location}</td>
+                    <td className="py-4 px-4 text-sm text-gray-300">{req.issue}</td>
+                    <td className="py-4 px-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${priorityStyles[req.priority]}`}>
+                        {req.priority}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${statusStyles[req.status]}`}>
+                        {req.status}
+                      </span>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile card list */}
+          <div className="md:hidden space-y-3">
+            {requests.map((req, i) => (
+              <motion.div
+                key={req.id}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="glass-card rounded-xl p-4"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono text-sm text-white">{req.id}</span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${statusStyles[req.status]}`}>
+                    {req.status}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-300 mb-1">{req.issue}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">{req.location}</span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${priorityStyles[req.priority]}`}>
+                    {req.priority}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Progress bars + Schedule */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Animated progress bars */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-card rounded-2xl p-6"
+            transition={{ duration: 0.6 }}
+            className="glass-card rounded-2xl p-5 sm:p-6"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                <Brain className="w-5 h-5 text-purple-400" />
+              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-secondary" />
               </div>
               <div>
-                <h4 className="font-semibold text-white">AI Predictions</h4>
-                <p className="text-xs text-gray-400">Next 30 days forecast</p>
+                <h3 className="font-semibold text-white">Maintenance Progress</h3>
+                <p className="text-xs text-gray-400">Category-wise completion</p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              {[
-                { label: 'HVAC Maintenance', percent: 78, color: '#8B5CF6' },
-                { label: 'Electrical Systems', percent: 92, color: '#2563EB' },
-                { label: 'Plumbing', percent: 65, color: '#38BDF8' },
-                { label: 'Elevators', percent: 88, color: '#06B6D4' },
-              ].map((item, idx) => (
-                <div key={item.label}>
+            <div className="space-y-5">
+              {progressBars.map((bar, i) => (
+                <div key={bar.label}>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-300">{item.label}</span>
-                    <span className="text-white font-medium">{item.percent}%</span>
+                    <span className="text-gray-300">{bar.label}</span>
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.4 + i * 0.1 }}
+                      className="text-white font-medium"
+                    >
+                      {bar.percent}%
+                    </motion.span>
                   </div>
-                  <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-2.5 rounded-full bg-white/5 overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      whileInView={{ width: `${item.percent}%` }}
+                      whileInView={{ width: `${bar.percent}%` }}
                       viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1, duration: 0.8 }}
-                      className="h-full rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
+                      transition={{ delay: i * 0.15, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                      className="h-full rounded-full relative"
+                      style={{
+                        background: `linear-gradient(90deg, ${bar.color}, ${bar.color}cc)`,
+                        boxShadow: `0 0 12px ${bar.color}80`,
+                      }}
+                    >
+                      <motion.div
+                        animate={{ x: ['-100%', '200%'] }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          ease: 'linear',
+                          delay: 1 + i * 0.15,
+                        }}
+                        className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                      />
+                    </motion.div>
                   </div>
                 </div>
               ))}
             </div>
           </motion.div>
 
+          {/* Today's Maintenance Schedule */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="glass-card rounded-2xl p-6"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="glass-card rounded-2xl p-5 sm:p-6"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                <Activity className="w-5 h-5 text-green-400" />
+              <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center">
+                <CalendarClock className="w-5 h-5 text-secondary" />
               </div>
               <div>
-                <h4 className="font-semibold text-white">System Health</h4>
-                <p className="text-xs text-gray-400">Overall performance</p>
+                <h3 className="font-semibold text-white">Today's Maintenance Schedule</h3>
+                <p className="text-xs text-gray-400">Planned tasks for today</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <ProgressChart percentage={94} label="Uptime" color="#10B981" />
-              <ProgressChart percentage={87} label="Efficiency" color="#38BDF8" />
-            </div>
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-[18px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/50 via-secondary/30 to-transparent" />
 
-            <div className="mt-6 pt-6 border-t border-white/10">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Campus Health Score</span>
-                <span className="text-lg font-bold text-green-400">A+</span>
+              <div className="space-y-4">
+                {scheduleItems.map((item, i) => (
+                  <motion.div
+                    key={item.time}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ x: 4 }}
+                    className="relative flex items-start gap-4 group"
+                  >
+                    {/* Node */}
+                    <div className="relative z-10 w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0 group-hover:bg-primary/30 transition-colors">
+                      <item.icon className="w-4 h-4 text-secondary" />
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <div className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="text-sm font-medium text-white">{item.time}</span>
+                        <span className="text-xs text-gray-400">· {item.location}</span>
+                      </div>
+                      <p className="text-sm text-gray-300 mt-0.5">{item.task}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="glass-card rounded-2xl p-6"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-yellow-400" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-white">Energy Usage</h4>
-                <p className="text-xs text-gray-400">This month</p>
-              </div>
-            </div>
-
-            <div className="text-center mb-6">
-              <h3 className="text-4xl font-bold text-white">2,847<span className="text-lg text-gray-400"> kWh</span></h3>
-              <p className="text-sm text-green-400 mt-1">12% less than last month</p>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { label: 'Lighting', value: '34%', color: '#F59E0B' },
-                { label: 'HVAC', value: '45%', color: '#2563EB' },
-                { label: 'Equipment', value: '21%', color: '#10B981' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-sm text-gray-300">{item.label}</span>
-                  </div>
-                  <span className="text-sm font-medium text-white">{item.value}</span>
-                </div>
-              ))}
             </div>
           </motion.div>
         </div>
